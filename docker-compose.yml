@@ -1,0 +1,16 @@
+version: "3.7"
+
+services:
+  php:
+    build: .
+    volumes:
+      - ./:/opt/www
+    tty: true
+  db:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=XTguSD7of8yx%G%r
+      - ACCEPT_EULA=Y
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
