@@ -9,21 +9,23 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\Sqlsrv;
 
 use Closure;
 use Hyperf\Database\Connection;
 use Hyperf\Database\Sqlsrv\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Hyperf\Database\Sqlsrv\Query\Processors\SqlServerProcessor as Processor;
+use Throwable;
 
 class SqlServerConnection extends Connection
 {
     /**
      * Execute a Closure within a transaction.
      *
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function transaction(\Closure $callback, int $attempts = 1): mixed
+    public function transaction(Closure $callback, int $attempts = 1): mixed
     {
         for ($a = 1; $a <= $attempts; ++$a) {
             if ($this->getDriverName() === 'sqlsrv') {
@@ -41,10 +43,10 @@ class SqlServerConnection extends Connection
                 $this->getPdo()->exec('COMMIT TRAN');
             }
 
-            // If we catch an exception, we will rollback so nothing gets messed
-            // up in the database. Then we'll re-throw the exception so it can
-            // be handled how the developer sees fit for their applications.
-            catch (\Throwable $e) {
+                // If we catch an exception, we will rollback so nothing gets messed
+                // up in the database. Then we'll re-throw the exception so it can
+                // be handled how the developer sees fit for their applications.
+            catch (Throwable $e) {
                 $this->getPdo()->exec('ROLLBACK TRAN');
 
                 throw $e;

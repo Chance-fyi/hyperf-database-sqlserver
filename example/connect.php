@@ -1,43 +1,26 @@
 <?php
 
-declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
-namespace Hyperf\Database\Sqlsvr;
-
-use Hyperf\Database\Sqlsrv\Connectors\SqlServerConnector;
-use Hyperf\Database\Sqlsrv\SqlServerConnection;
+use Hyperf\Database\Sqlsrv\Sqlsrv;
+use Hyperf\Di\Container;
+use Hyperf\Di\Definition\DefinitionSourceFactory;
+use Hyperf\Utils\ApplicationContext;
 use Hyperf\Utils\Coroutine;
 use Hyperf\Utils\Parallel;
 
-require 'vendor/autoload.php';
+require "vendor/autoload.php";
 
-$config = [
-    'host' => 'db',
-    'port' => 1433,
-    'database' => 'master',
-    'username' => 'sa',
-    'password' => 'XTguSD7of8yx%G%r',
-    'trust_server_certificate' => true,
-];
+const BASE_PATH = __DIR__ . "/../";
+$container = new Container((new DefinitionSourceFactory())());
+ApplicationContext::setContainer($container);
 
 $now = microtime(true);
 
 $parallel = new Parallel();
 
 for ($i = 2; $i > 0; --$i) {
-    $parallel->add(function () use ($config) {
+    $parallel->add(function () {
         $now = microtime(true);
-        $connector = new SqlServerConnector();
-        $conn = $connector->connect($config);
-        $sqlsrv = new SqlServerConnection($conn);
-        $sqlsrv->statement("WAITFOR DELAY '00:00:02'");
+        Sqlsrv::statement("WAITFOR DELAY '00:00:02'");
         var_dump(microtime(true) - $now);
         return Coroutine::id();
     });

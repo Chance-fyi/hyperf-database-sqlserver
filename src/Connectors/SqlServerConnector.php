@@ -9,8 +9,10 @@ declare(strict_types=1);
  * @contact  group@hyperf.io
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
+
 namespace Hyperf\Database\Sqlsrv\Connectors;
 
+use Exception;
 use Hyperf\Database\Connectors\Connector;
 use Hyperf\Database\Connectors\ConnectorInterface;
 use Hyperf\Utils\Arr;
@@ -24,18 +26,18 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      * @var array
      */
     protected $options = [
-        \PDO::ATTR_CASE => \PDO::CASE_NATURAL,
-        \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-        \PDO::ATTR_ORACLE_NULLS => \PDO::NULL_NATURAL,
-        \PDO::ATTR_STRINGIFY_FETCHES => false,
+        PDO::ATTR_CASE => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_STRINGIFY_FETCHES => false,
     ];
 
     /**
      * Establish a database connection.
      *
-     * @throws \Exception
+     * @throws Exception
      */
-    public function connect(array $config): \PDO
+    public function connect(array $config): PDO
     {
         $options = $this->getOptions($config);
 
@@ -163,8 +165,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     protected function buildConnectString(string $driver, array $arguments): string
     {
         return $driver . ':' . implode(';', array_map(function ($key) use ($arguments) {
-            return sprintf('%s=%s', $key, $arguments[$key]);
-        }, array_keys($arguments)));
+                return sprintf('%s=%s', $key, $arguments[$key]);
+            }, array_keys($arguments)));
     }
 
     /**
@@ -184,6 +186,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      */
     protected function getAvailableDrivers(): array
     {
-        return \PDO::getAvailableDrivers();
+        return PDO::getAvailableDrivers();
     }
 }
