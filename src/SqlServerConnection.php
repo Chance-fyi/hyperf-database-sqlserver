@@ -14,8 +14,14 @@ namespace Hyperf\Database\Sqlsrv;
 
 use Closure;
 use Hyperf\Database\Connection;
+use Hyperf\Database\Query\Processors\Processor;
+use Hyperf\Database\Schema\Builder;
 use Hyperf\Database\Sqlsrv\Query\Grammars\SqlServerGrammar as QueryGrammar;
-use Hyperf\Database\Sqlsrv\Query\Processors\SqlServerProcessor as Processor;
+use Hyperf\Database\Sqlsrv\Query\Processors\SqlServerProcessor;
+use Hyperf\Database\Sqlsrv\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
+use Hyperf\Database\Sqlsrv\Schema\SqlServerBuilder;
+use Hyperf\Support\Filesystem\Filesystem;
+use RuntimeException;
 use Throwable;
 
 class SqlServerConnection extends Connection
@@ -66,10 +72,47 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return SqlServerBuilder
+     */
+    public function getSchemaBuilder(): Builder
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new SqlServerBuilder($this);
+    }
+
+    /**
+     * Get the default schema grammar instance.
+     */
+    protected function getDefaultSchemaGrammar(): SchemaGrammar
+    {
+        return $this->withTablePrefix(new SchemaGrammar);
+    }
+
+    /**
+     * Get the schema state for the connection.
+     *
+     * @param Filesystem|null $files
+     * @param callable|null $processFactory
+     *
+     * @throws RuntimeException
+     */
+    public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
+    {
+        throw new RuntimeException('Schema dumping is not supported when using SQL Server.');
+    }
+
+    /**
      * Get the default post processor instance.
+     *
+     * @return SqlServerProcessor
      */
     protected function getDefaultPostProcessor(): Processor
     {
-        return new Processor();
+        return new SqlServerProcessor;
     }
 }

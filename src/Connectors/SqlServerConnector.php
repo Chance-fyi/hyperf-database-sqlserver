@@ -13,9 +13,9 @@ declare(strict_types=1);
 namespace Hyperf\Database\Sqlsrv\Connectors;
 
 use Exception;
+use Hyperf\Collection\Arr;
 use Hyperf\Database\Connectors\Connector;
 use Hyperf\Database\Connectors\ConnectorInterface;
-use Hyperf\Utils\Arr;
 use PDO;
 
 class SqlServerConnector extends Connector implements ConnectorInterface
@@ -35,17 +35,46 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Establish a database connection.
      *
+     * @param array $config
+     * @return PDO
      * @throws Exception
      */
     public function connect(array $config): PDO
     {
         $options = $this->getOptions($config);
 
-        return $this->createConnection($this->getDsn($config), $config, $options);
+        $connection = $this->createConnection($this->getDsn($config), $config, $options);
+
+        $this->configureIsolationLevel($connection, $config);
+
+        return $connection;
+    }
+
+    /**
+     * Set the connection transaction isolation level.
+     *
+     * https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql
+     *
+     * @param PDO $connection
+     * @param array $config
+     * @return void
+     */
+    protected function configureIsolationLevel(PDO $connection, array $config): void
+    {
+        if (!isset($config['isolation_level'])) {
+            return;
+        }
+
+        $connection->prepare(
+            "SET TRANSACTION ISOLATION LEVEL {$config['isolation_level']}"
+        )->execute();
     }
 
     /**
      * Create a DSN string from a configuration.
+     *
+     * @param array $config
+     * @return string
      */
     protected function getDsn(array $config): string
     {
@@ -58,21 +87,28 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
         if (in_array('sqlsrv', $this->getAvailableDrivers())) {
             return $this->getSqlSrvDsn($config);
+        } else {
+            return $this->getDblibDsn($config);
         }
-        return $this->getDblibDsn($config);
     }
 
     /**
      * Determine if the database configuration prefers ODBC.
+     *
+     * @param array $config
+     * @return bool
      */
     protected function prefersOdbc(array $config): bool
     {
-        return in_array('odbc', $this->getAvailableDrivers())
-            && ($config['odbc'] ?? null) === true;
+        return in_array('odbc', $this->getAvailableDrivers()) &&
+            ($config['odbc'] ?? null) === true;
     }
 
     /**
      * Get the DSN string for a DbLib connection.
+     *
+     * @param array $config
+     * @return string
      */
     protected function getDblibDsn(array $config): string
     {
@@ -84,6 +120,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Get the DSN string for an ODBC connection.
+     *
+     * @param array $config
+     * @return string
      */
     protected function getOdbcDsn(array $config): string
     {
@@ -93,6 +132,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Get the DSN string for a SqlSrv connection.
+     *
+     * @param array $config
+     * @return string
      */
     protected function getSqlSrvDsn(array $config): string
     {
@@ -156,11 +198,19 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['LoginTimeout'] = $config['login_timeout'];
         }
 
+        if (isset($config['authentication'])) {
+            $arguments['Authentication'] = $config['authentication'];
+        }
+
         return $this->buildConnectString('sqlsrv', $arguments);
     }
 
     /**
      * Build a connection string from the given arguments.
+     *
+     * @param string $driver
+     * @param array $arguments
+     * @return string
      */
     protected function buildConnectString(string $driver, array $arguments): string
     {
@@ -171,6 +221,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Build a host string from the given configuration.
+     *
+     * @param array $config
+     * @param string $separator
+     * @return string
      */
     protected function buildHostString(array $config, string $separator): string
     {
@@ -183,6 +237,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Get the available PDO drivers.
+     *
+     * @return array
      */
     protected function getAvailableDrivers(): array
     {

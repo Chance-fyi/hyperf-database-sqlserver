@@ -4,7 +4,8 @@
     "license": "MIT",
     "keywords": [
         "php",
-        "hyperf"
+        "hyperf",
+        "SqlServer"
     ],
     "description": "Add Sql Server support to Hyperf",
     "autoload": {
@@ -20,10 +21,7 @@
     "require": {
         "php": ">=8.0",
         "ext-pdo": "*",
-        "hyperf/database": "^3.0",
-        "hyperf/di": "^3.0",
-        "hyperf/pool": "^3.0",
-        "psr/container": "^2.0"
+        "hyperf/db-connection": "^3.0"
     },
     "require-dev": {
         "friendsofphp/php-cs-fixer": "^3.0",

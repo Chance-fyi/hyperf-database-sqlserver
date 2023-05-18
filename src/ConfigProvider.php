@@ -12,30 +12,16 @@ declare(strict_types=1);
 
 namespace Hyperf\Database\Sqlsrv;
 
+use Hyperf\Database\Sqlsrv\Aspect\SqlServerAspect;
+
 class ConfigProvider
 {
     public function __invoke(): array
     {
         return [
-            'dependencies' => [
-            ],
-            'commands' => [
-            ],
-            'annotations' => [
-                'scan' => [
-                    'paths' => [
-                        __DIR__,
-                    ],
-                ],
-            ],
-            'publish' => [
-                [
-                    'id' => 'config',
-                    'description' => 'The config of sql server client.',
-                    'source' => __DIR__ . '/../publish/sqlsrv.php',
-                    'destination' => BASE_PATH . '/config/autoload/sqlsrv.php',
-                ],
-            ],
+            'aspects' => [
+                SqlServerAspect::class
+            ]
         ];
     }
 }
