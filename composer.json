@@ -7,10 +7,16 @@
         "hyperf",
         "SqlServer"
     ],
-    "description": "Add Sql Server support to Hyperf",
+    "authors": [
+        {
+            "name": "Chance",
+            "email": "chance.fyii@gmail.com"
+        }
+    ],
+    "description": "Add SqlServer support to Hyperf",
     "autoload": {
         "psr-4": {
-            "Hyperf\\Database\\Sqlsrv\\": "src/"
+            "Chance\\Hyperf\\Database\\Sqlsrv\\": "src/"
         }
     },
     "autoload-dev": {
@@ -47,7 +53,7 @@
     },
     "extra": {
         "hyperf": {
-            "config": "Hyperf\\Database\\Sqlsrv\\ConfigProvider"
+            "config": "Chance\\Hyperf\\Database\\Sqlsrv\\ConfigProvider"
         }
     }
 }

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Database\Sqlsrv\Query\Grammars;
+namespace Chance\Hyperf\Database\Sqlsrv\Query\Grammars;
 
 use Hyperf\Collection\Arr;
 use Hyperf\Database\Query\Builder;

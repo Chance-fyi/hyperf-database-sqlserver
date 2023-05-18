@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Database\Sqlsrv\Query\Processors;
+namespace Chance\Hyperf\Database\Sqlsrv\Query\Processors;
 
 use Exception;
 use Hyperf\Database\Connection;

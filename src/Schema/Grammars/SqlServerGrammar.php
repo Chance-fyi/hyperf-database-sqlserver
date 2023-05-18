@@ -4,7 +4,7 @@
  * Date 2023/5/18 11:05
  */
 
-namespace Hyperf\Database\Sqlsrv\Schema\Grammars;
+namespace Chance\Hyperf\Database\Sqlsrv\Schema\Grammars;
 
 use Hyperf\Database\Connection;
 use Hyperf\Database\Query\Expression;

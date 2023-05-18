@@ -4,10 +4,10 @@
  * Date 2023/5/17 16:45
  */
 
-namespace Hyperf\Database\Sqlsrv\Aspect;
+namespace Chance\Hyperf\Database\Sqlsrv\Aspect;
 
-use Hyperf\Database\Sqlsrv\Connectors\SqlServerConnector;
-use Hyperf\Database\Sqlsrv\SqlServerConnection;
+use Chance\Hyperf\Database\Sqlsrv\Connectors\SqlServerConnector;
+use Chance\Hyperf\Database\Sqlsrv\SqlServerConnection;
 use Hyperf\Di\Annotation\Aspect;
 use Hyperf\Di\Aop\AbstractAspect;
 use Hyperf\Di\Aop\ProceedingJoinPoint;

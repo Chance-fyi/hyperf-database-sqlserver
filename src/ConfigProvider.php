@@ -10,9 +10,9 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Database\Sqlsrv;
+namespace Chance\Hyperf\Database\Sqlsrv;
 
-use Hyperf\Database\Sqlsrv\Aspect\SqlServerAspect;
+use Chance\Hyperf\Database\Sqlsrv\Aspect\SqlServerAspect;
 
 class ConfigProvider
 {

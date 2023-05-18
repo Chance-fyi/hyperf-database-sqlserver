@@ -4,7 +4,7 @@
  * Date 2023/5/18 11:17
  */
 
-namespace Hyperf\Database\Sqlsrv\Schema;
+namespace Chance\Hyperf\Database\Sqlsrv\Schema;
 
 use Hyperf\Database\Schema\Builder;
 

@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Database\Sqlsrv\Connectors;
+namespace Chance\Hyperf\Database\Sqlsrv\Connectors;
 
 use Exception;
 use Hyperf\Collection\Arr;

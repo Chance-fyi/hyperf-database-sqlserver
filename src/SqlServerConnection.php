@@ -10,16 +10,16 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Hyperf\Database\Sqlsrv;
+namespace Chance\Hyperf\Database\Sqlsrv;
 
 use Closure;
 use Hyperf\Database\Connection;
 use Hyperf\Database\Query\Processors\Processor;
 use Hyperf\Database\Schema\Builder;
-use Hyperf\Database\Sqlsrv\Query\Grammars\SqlServerGrammar as QueryGrammar;
-use Hyperf\Database\Sqlsrv\Query\Processors\SqlServerProcessor;
-use Hyperf\Database\Sqlsrv\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
-use Hyperf\Database\Sqlsrv\Schema\SqlServerBuilder;
+use Chance\Hyperf\Database\Sqlsrv\Query\Grammars\SqlServerGrammar as QueryGrammar;
+use Chance\Hyperf\Database\Sqlsrv\Query\Processors\SqlServerProcessor;
+use Chance\Hyperf\Database\Sqlsrv\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
+use Chance\Hyperf\Database\Sqlsrv\Schema\SqlServerBuilder;
 use Hyperf\Support\Filesystem\Filesystem;
 use RuntimeException;
 use Throwable;
