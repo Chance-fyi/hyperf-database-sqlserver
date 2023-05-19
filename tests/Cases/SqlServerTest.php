@@ -12,7 +12,6 @@ declare(strict_types=1);
 
 namespace HyperfTest\Cases;
 
-use Exception;
 use Hyperf\DbConnection\Db;
 
 /**

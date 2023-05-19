@@ -12,20 +12,24 @@ declare(strict_types=1);
 
 namespace Chance\Hyperf\Database\Sqlsrv;
 
-use Closure;
-use Hyperf\Database\Connection;
-use Hyperf\Database\Query\Processors\Processor;
-use Hyperf\Database\Schema\Builder;
 use Chance\Hyperf\Database\Sqlsrv\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Chance\Hyperf\Database\Sqlsrv\Query\Processors\SqlServerProcessor;
 use Chance\Hyperf\Database\Sqlsrv\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 use Chance\Hyperf\Database\Sqlsrv\Schema\SqlServerBuilder;
+use Chance\Hyperf\Database\Sqlsrv\Task\SqlServerTask;
+use Closure;
+use Hyperf\Context\ApplicationContext;
+use Hyperf\Database\Connection;
+use Hyperf\Database\Query\Processors\Processor;
+use Hyperf\Database\Schema\Builder;
 use Hyperf\Support\Filesystem\Filesystem;
 use RuntimeException;
 use Throwable;
 
 class SqlServerConnection extends Connection
 {
+    protected bool $isTaskEnvironment = false;
+
     /**
      * Execute a Closure within a transaction.
      *
@@ -114,5 +118,47 @@ class SqlServerConnection extends Connection
     protected function getDefaultPostProcessor(): Processor
     {
         return new SqlServerProcessor;
+    }
+
+    public function setIsTaskEnvironment(bool $isTaskEnvironment = true): static
+    {
+        $this->isTaskEnvironment = $isTaskEnvironment;
+        return $this;
+    }
+
+    public function select(string $query, array $bindings = [], bool $useReadPdo = true): array
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+            return $client->select((string)$this->getConfig('name'), $query, $bindings, $useReadPdo);
+        }
+        return parent::select($query, $bindings, $useReadPdo);
+    }
+
+    public function statement(string $query, array $bindings = []): bool
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+            return $client->statement((string)$this->getConfig('name'), $query, $bindings);
+        }
+        return parent::statement($query, $bindings);
+    }
+
+    public function affectingStatement(string $query, array $bindings = []): int
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+            return $client->affectingStatement((string)$this->getConfig('name'), $query, $bindings);
+        }
+        return parent::affectingStatement($query, $bindings);
+    }
+
+    public function unprepared(string $query): bool
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+            return $client->unprepared((string)$this->getConfig('name'), $query);
+        }
+        return parent::unprepared($query);
     }
 }
