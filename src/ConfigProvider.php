@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Chance\Hyperf\Database\Sqlsrv;
 
-use Chance\Hyperf\Database\Sqlsrv\Aspect\SqlServerAspect;
+use Chance\Hyperf\Database\Sqlsrv\Connectors\SqlServerConnector;
+use Chance\Hyperf\Database\Sqlsrv\Listener\RegisterConnectionListener;
 
 class ConfigProvider
 {
@@ -18,8 +19,11 @@ class ConfigProvider
                     ],
                 ],
             ],
-            'aspects' => [
-                SqlServerAspect::class,
+            'dependencies' => [
+                'db.connector.sqlsrv' => SqlServerConnector::class,
+            ],
+            'listeners' => [
+                RegisterConnectionListener::class,
             ],
         ];
     }
