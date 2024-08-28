@@ -1,8 +1,4 @@
 <?php
-/**
- * Created by PhpStorm
- * Date 2023/5/18 17:30
- */
 
 namespace Chance\Hyperf\Database\Sqlsrv\Task;
 
@@ -17,6 +13,7 @@ class SqlServerTask
     {
         /** @var SqlServerConnection $conn */
         $conn = Db::connection($connection);
+
         return $conn->setIsTaskEnvironment()->select($query, $bindings, $useReadPdo);
     }
 
@@ -25,6 +22,7 @@ class SqlServerTask
     {
         /** @var SqlServerConnection $conn */
         $conn = Db::connection($connection);
+
         return $conn->setIsTaskEnvironment()->statement($query, $bindings);
     }
 
@@ -33,6 +31,7 @@ class SqlServerTask
     {
         /** @var SqlServerConnection $conn */
         $conn = Db::connection($connection);
+
         return $conn->setIsTaskEnvironment()->affectingStatement($query, $bindings);
     }
 
@@ -41,6 +40,7 @@ class SqlServerTask
     {
         /** @var SqlServerConnection $conn */
         $conn = Db::connection($connection);
+
         return $conn->setIsTaskEnvironment()->unprepared($query);
     }
 }

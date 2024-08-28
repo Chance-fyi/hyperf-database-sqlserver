@@ -1,8 +1,4 @@
 <?php
-/**
- * Created by PhpStorm
- * Date 2023/5/17 16:45
- */
 
 namespace Chance\Hyperf\Database\Sqlsrv\Aspect;
 
@@ -28,12 +24,13 @@ class SqlServerAspect extends AbstractAspect
         } catch (InvalidArgumentException $e) {
             $methodName = $proceedingJoinPoint->methodName;
             $arguments = $proceedingJoinPoint->arguments['keys'];
-            if ($methodName === 'createConnection' && $arguments['driver'] === 'sqlsrv') {
+            if ('createConnection' === $methodName && 'sqlsrv' === $arguments['driver']) {
                 return new SqlServerConnection($arguments['connection'], $arguments['database'], $arguments['prefix'], $arguments['config']);
             }
-            if ($methodName === 'createConnector' && $arguments['config']['driver'] === 'sqlsrv') {
+            if ('createConnector' === $methodName && 'sqlsrv' === $arguments['config']['driver']) {
                 return new SqlServerConnector();
             }
+
             throw $e;
         }
     }

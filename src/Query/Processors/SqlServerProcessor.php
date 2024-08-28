@@ -1,14 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
 
 namespace Chance\Hyperf\Database\Sqlsrv\Query\Processors;
 
@@ -22,11 +14,10 @@ class SqlServerProcessor extends Processor
     /**
      * Process an "insert get ID" query.
      *
-     * @param Builder $query
-     * @param string $sql
-     * @param array $values
-     * @param string|null $sequence
-     * @return int
+     * @param string      $sql
+     * @param array       $values
+     * @param null|string $sequence
+     *
      * @throws Exception
      */
     public function processInsertGetId(Builder $query, $sql, $values, $sequence = null): int
@@ -36,20 +27,27 @@ class SqlServerProcessor extends Processor
 
         $connection->insert($sql, $values);
 
-        if ($connection->getConfig('odbc') === true) {
+        if (true === $connection->getConfig('odbc')) {
             $id = $this->processInsertGetIdForOdbc($connection);
         } else {
             $id = $connection->getPdo()->lastInsertId();
         }
 
-        return is_numeric($id) ? (int)$id : $id;
+        return is_numeric($id) ? (int) $id : $id;
+    }
+
+    /**
+     * Process the results of a column listing query.
+     */
+    public function processColumnListing(array $results): array
+    {
+        return array_map(function ($result) {
+            return ((object) $result)->name;
+        }, $results);
     }
 
     /**
      * Process an "insert get ID" query for ODBC.
-     *
-     * @param Connection $connection
-     * @return int
      *
      * @throws Exception
      */
@@ -66,18 +64,5 @@ class SqlServerProcessor extends Processor
         $row = $result[0];
 
         return is_object($row) ? $row->insertid : $row['insertid'];
-    }
-
-    /**
-     * Process the results of a column listing query.
-     *
-     * @param array $results
-     * @return array
-     */
-    public function processColumnListing(array $results): array
-    {
-        return array_map(function ($result) {
-            return ((object)$result)->name;
-        }, $results);
     }
 }

@@ -1,8 +1,4 @@
 <?php
-/**
- * Created by PhpStorm
- * Date 2023/5/18 11:17
- */
 
 namespace Chance\Hyperf\Database\Sqlsrv\Schema;
 
@@ -12,9 +8,6 @@ class SqlServerBuilder extends Builder
 {
     /**
      * Create a database in the schema.
-     *
-     * @param string $name
-     * @return bool
      */
     public function createDatabase(string $name): bool
     {
@@ -25,9 +18,6 @@ class SqlServerBuilder extends Builder
 
     /**
      * Drop a database from the schema if the database exists.
-     *
-     * @param string $name
-     * @return bool
      */
     public function dropDatabaseIfExists(string $name): bool
     {
@@ -38,8 +28,6 @@ class SqlServerBuilder extends Builder
 
     /**
      * Drop all tables from the database.
-     *
-     * @return void
      */
     public function dropAllTables(): void
     {
@@ -50,8 +38,6 @@ class SqlServerBuilder extends Builder
 
     /**
      * Drop all views from the database.
-     *
-     * @return void
      */
     public function dropAllViews(): void
     {
@@ -60,8 +46,6 @@ class SqlServerBuilder extends Builder
 
     /**
      * Drop all tables from the database.
-     *
-     * @return array
      */
     public function getAllTables(): array
     {
@@ -72,8 +56,6 @@ class SqlServerBuilder extends Builder
 
     /**
      * Get all of the view names for the database.
-     *
-     * @return array
      */
     public function getAllViews(): array
     {

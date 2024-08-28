@@ -1,14 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
 
 namespace Chance\Hyperf\Database\Sqlsrv;
 
@@ -38,7 +30,7 @@ class SqlServerConnection extends Connection
     public function transaction(Closure $callback, int $attempts = 1): mixed
     {
         for ($a = 1; $a <= $attempts; ++$a) {
-            if ($this->getDriverName() === 'sqlsrv') {
+            if ('sqlsrv' === $this->getDriverName()) {
                 return parent::transaction($callback, $attempts);
             }
 
@@ -53,9 +45,9 @@ class SqlServerConnection extends Connection
                 $this->getPdo()->exec('COMMIT TRAN');
             }
 
-                // If we catch an exception, we will rollback so nothing gets messed
-                // up in the database. Then we'll re-throw the exception so it can
-                // be handled how the developer sees fit for their applications.
+            // If we catch an exception, we will rollback so nothing gets messed
+            // up in the database. Then we'll re-throw the exception so it can
+            // be handled how the developer sees fit for their applications.
             catch (Throwable $e) {
                 $this->getPdo()->exec('ROLLBACK TRAN');
 
@@ -64,15 +56,8 @@ class SqlServerConnection extends Connection
 
             return $result;
         }
-        return null;
-    }
 
-    /**
-     * Get the default query grammar instance.
-     */
-    protected function getDefaultQueryGrammar(): QueryGrammar
-    {
-        return $this->withTablePrefix(new QueryGrammar());
+        return null;
     }
 
     /**
@@ -90,24 +75,80 @@ class SqlServerConnection extends Connection
     }
 
     /**
+     * Get the schema state for the connection.
+     *
+     * @throws RuntimeException
+     */
+    public function getSchemaState(?Filesystem $files = null, ?callable $processFactory = null)
+    {
+        throw new RuntimeException('Schema dumping is not supported when using SQL Server.');
+    }
+
+    public function setIsTaskEnvironment(bool $isTaskEnvironment = true): static
+    {
+        $this->isTaskEnvironment = $isTaskEnvironment;
+
+        return $this;
+    }
+
+    public function select(string $query, array $bindings = [], bool $useReadPdo = true): array
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+
+            return $client->select((string) $this->getConfig('name'), $query, $bindings, $useReadPdo);
+        }
+
+        return parent::select($query, $bindings, $useReadPdo);
+    }
+
+    public function statement(string $query, array $bindings = []): bool
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+
+            return $client->statement((string) $this->getConfig('name'), $query, $bindings);
+        }
+
+        return parent::statement($query, $bindings);
+    }
+
+    public function affectingStatement(string $query, array $bindings = []): int
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+
+            return $client->affectingStatement((string) $this->getConfig('name'), $query, $bindings);
+        }
+
+        return parent::affectingStatement($query, $bindings);
+    }
+
+    public function unprepared(string $query): bool
+    {
+        if (!$this->isTaskEnvironment) {
+            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
+
+            return $client->unprepared((string) $this->getConfig('name'), $query);
+        }
+
+        return parent::unprepared($query);
+    }
+
+    /**
+     * Get the default query grammar instance.
+     */
+    protected function getDefaultQueryGrammar(): QueryGrammar
+    {
+        return $this->withTablePrefix(new QueryGrammar());
+    }
+
+    /**
      * Get the default schema grammar instance.
      */
     protected function getDefaultSchemaGrammar(): SchemaGrammar
     {
-        return $this->withTablePrefix(new SchemaGrammar);
-    }
-
-    /**
-     * Get the schema state for the connection.
-     *
-     * @param Filesystem|null $files
-     * @param callable|null $processFactory
-     *
-     * @throws RuntimeException
-     */
-    public function getSchemaState(Filesystem $files = null, callable $processFactory = null)
-    {
-        throw new RuntimeException('Schema dumping is not supported when using SQL Server.');
+        return $this->withTablePrefix(new SchemaGrammar());
     }
 
     /**
@@ -117,48 +158,6 @@ class SqlServerConnection extends Connection
      */
     protected function getDefaultPostProcessor(): Processor
     {
-        return new SqlServerProcessor;
-    }
-
-    public function setIsTaskEnvironment(bool $isTaskEnvironment = true): static
-    {
-        $this->isTaskEnvironment = $isTaskEnvironment;
-        return $this;
-    }
-
-    public function select(string $query, array $bindings = [], bool $useReadPdo = true): array
-    {
-        if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-            return $client->select((string)$this->getConfig('name'), $query, $bindings, $useReadPdo);
-        }
-        return parent::select($query, $bindings, $useReadPdo);
-    }
-
-    public function statement(string $query, array $bindings = []): bool
-    {
-        if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-            return $client->statement((string)$this->getConfig('name'), $query, $bindings);
-        }
-        return parent::statement($query, $bindings);
-    }
-
-    public function affectingStatement(string $query, array $bindings = []): int
-    {
-        if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-            return $client->affectingStatement((string)$this->getConfig('name'), $query, $bindings);
-        }
-        return parent::affectingStatement($query, $bindings);
-    }
-
-    public function unprepared(string $query): bool
-    {
-        if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-            return $client->unprepared((string)$this->getConfig('name'), $query);
-        }
-        return parent::unprepared($query);
+        return new SqlServerProcessor();
     }
 }

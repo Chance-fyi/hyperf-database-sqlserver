@@ -1,14 +1,6 @@
 <?php
 
 declare(strict_types=1);
-/**
- * This file is part of Hyperf.
- *
- * @link     https://www.hyperf.io
- * @document https://hyperf.wiki
- * @contact  group@hyperf.io
- * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
- */
 
 namespace Chance\Hyperf\Database\Sqlsrv\Connectors;
 
@@ -35,8 +27,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
     /**
      * Establish a database connection.
      *
-     * @param array $config
-     * @return PDO
      * @throws Exception
      */
     public function connect(array $config): PDO
@@ -54,10 +44,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      * Set the connection transaction isolation level.
      *
      * https://learn.microsoft.com/en-us/sql/t-sql/statements/set-transaction-isolation-level-transact-sql
-     *
-     * @param PDO $connection
-     * @param array $config
-     * @return void
      */
     protected function configureIsolationLevel(PDO $connection, array $config): void
     {
@@ -72,9 +58,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Create a DSN string from a configuration.
-     *
-     * @param array $config
-     * @return string
      */
     protected function getDsn(array $config): string
     {
@@ -87,28 +70,22 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
         if (in_array('sqlsrv', $this->getAvailableDrivers())) {
             return $this->getSqlSrvDsn($config);
-        } else {
-            return $this->getDblibDsn($config);
         }
+
+        return $this->getDblibDsn($config);
     }
 
     /**
      * Determine if the database configuration prefers ODBC.
-     *
-     * @param array $config
-     * @return bool
      */
     protected function prefersOdbc(array $config): bool
     {
-        return in_array('odbc', $this->getAvailableDrivers()) &&
-            ($config['odbc'] ?? null) === true;
+        return in_array('odbc', $this->getAvailableDrivers())
+            && ($config['odbc'] ?? null) === true;
     }
 
     /**
      * Get the DSN string for a DbLib connection.
-     *
-     * @param array $config
-     * @return string
      */
     protected function getDblibDsn(array $config): string
     {
@@ -120,9 +97,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Get the DSN string for an ODBC connection.
-     *
-     * @param array $config
-     * @return string
      */
     protected function getOdbcDsn(array $config): string
     {
@@ -132,9 +106,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Get the DSN string for a SqlSrv connection.
-     *
-     * @param array $config
-     * @return string
      */
     protected function getSqlSrvDsn(array $config): string
     {
@@ -150,7 +121,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['ApplicationIntent'] = 'ReadOnly';
         }
 
-        if (isset($config['pooling']) && $config['pooling'] === false) {
+        if (isset($config['pooling']) && false === $config['pooling']) {
             $arguments['ConnectionPooling'] = '0';
         }
 
@@ -166,7 +137,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['TrustServerCertificate'] = $config['trust_server_certificate'];
         }
 
-        if (isset($config['multiple_active_result_sets']) && $config['multiple_active_result_sets'] === false) {
+        if (isset($config['multiple_active_result_sets']) && false === $config['multiple_active_result_sets']) {
             $arguments['MultipleActiveResultSets'] = 'false';
         }
 
@@ -207,24 +178,16 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Build a connection string from the given arguments.
-     *
-     * @param string $driver
-     * @param array $arguments
-     * @return string
      */
     protected function buildConnectString(string $driver, array $arguments): string
     {
         return $driver . ':' . implode(';', array_map(function ($key) use ($arguments) {
-                return sprintf('%s=%s', $key, $arguments[$key]);
-            }, array_keys($arguments)));
+            return sprintf('%s=%s', $key, $arguments[$key]);
+        }, array_keys($arguments)));
     }
 
     /**
      * Build a host string from the given configuration.
-     *
-     * @param array $config
-     * @param string $separator
-     * @return string
      */
     protected function buildHostString(array $config, string $separator): string
     {
@@ -237,8 +200,6 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
     /**
      * Get the available PDO drivers.
-     *
-     * @return array
      */
     protected function getAvailableDrivers(): array
     {
