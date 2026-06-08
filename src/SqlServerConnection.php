@@ -140,6 +140,12 @@ class SqlServerConnection extends Connection
     protected function runInTaskWorker(string $method, array $arguments): mixed
     {
         $executor = ApplicationContext::getContainer()->get(TaskExecutor::class);
+        if ($executor->isTaskEnvironment()) {
+            // No task worker to offload to (CLI/command context, or already inside
+            // a task worker): run the query inline instead of dispatching.
+            return ApplicationContext::getContainer()->get(SqlServerTask::class)->{$method}(...$arguments);
+        }
+
         $timeout = (float) ($this->getConfig('task_timeout') ?? 10);
 
         return $executor->execute(new TaskMessage([SqlServerTask::class, $method], $arguments), $timeout);
