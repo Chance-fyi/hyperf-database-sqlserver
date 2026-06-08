@@ -15,6 +15,8 @@ use Hyperf\Database\Connection;
 use Hyperf\Database\Query\Processors\Processor;
 use Hyperf\Database\Schema\Builder;
 use Hyperf\Support\Filesystem\Filesystem;
+use Hyperf\Task\Task as TaskMessage;
+use Hyperf\Task\TaskExecutor;
 use RuntimeException;
 use Throwable;
 
@@ -94,9 +96,7 @@ class SqlServerConnection extends Connection
     public function select(string $query, array $bindings = [], bool $useReadPdo = true): array
     {
         if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-
-            return $client->select((string) $this->getConfig('name'), $query, $bindings, $useReadPdo);
+            return $this->runInTaskWorker(__FUNCTION__, [(string) $this->getConfig('name'), $query, $bindings, $useReadPdo]);
         }
 
         return parent::select($query, $bindings, $useReadPdo);
@@ -105,9 +105,7 @@ class SqlServerConnection extends Connection
     public function statement(string $query, array $bindings = []): bool
     {
         if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-
-            return $client->statement((string) $this->getConfig('name'), $query, $bindings);
+            return $this->runInTaskWorker(__FUNCTION__, [(string) $this->getConfig('name'), $query, $bindings]);
         }
 
         return parent::statement($query, $bindings);
@@ -116,9 +114,7 @@ class SqlServerConnection extends Connection
     public function affectingStatement(string $query, array $bindings = []): int
     {
         if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-
-            return $client->affectingStatement((string) $this->getConfig('name'), $query, $bindings);
+            return $this->runInTaskWorker(__FUNCTION__, [(string) $this->getConfig('name'), $query, $bindings]);
         }
 
         return parent::affectingStatement($query, $bindings);
@@ -127,12 +123,26 @@ class SqlServerConnection extends Connection
     public function unprepared(string $query): bool
     {
         if (!$this->isTaskEnvironment) {
-            $client = ApplicationContext::getContainer()->get(SqlServerTask::class);
-
-            return $client->unprepared((string) $this->getConfig('name'), $query);
+            return $this->runInTaskWorker(__FUNCTION__, [(string) $this->getConfig('name'), $query]);
         }
 
         return parent::unprepared($query);
+    }
+
+    /**
+     * Dispatch a SqlServerTask method to a task worker.
+     *
+     * The Task execute timeout is configurable per connection through the
+     * `task_timeout` option (in seconds) and defaults to 10 to keep the
+     * previous behaviour. Raise it for heavy queries that legitimately take
+     * longer than 10s, which would otherwise fail with "Task [N] execute timeout".
+     */
+    protected function runInTaskWorker(string $method, array $arguments): mixed
+    {
+        $executor = ApplicationContext::getContainer()->get(TaskExecutor::class);
+        $timeout = (float) ($this->getConfig('task_timeout') ?? 10);
+
+        return $executor->execute(new TaskMessage([SqlServerTask::class, $method], $arguments), $timeout);
     }
 
     /**
